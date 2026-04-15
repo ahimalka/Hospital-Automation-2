@@ -1,1 +1,1 @@
-{"uid":"b1a8273437954620fa374b796ffaacdd","name":"behaviors","children":[]}
+{"uid":"b1a8273437954620fa374b796ffaacdd","name":"behaviors","children":[{"name":"test_smoke[chromium]","uid":"75cdee8957c3e7e6","parentUid":"b1a8273437954620fa374b796ffaacdd","status":"passed","time":{"start":1776274646631,"stop":1776274649588,"duration":2957},"flaky":false,"newFailed":false,"newPassed":false,"newBroken":false,"retriesCount":0,"retriesStatusChange":false,"parameters":["'chromium'"],"tags":[]}]}
