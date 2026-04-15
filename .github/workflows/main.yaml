@@ -1,12 +1,15 @@
 ﻿name: CI/CD Pipeline
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
       - '**'
   pull_request:
     branches:
-      - '**'
+      - main
   workflow_dispatch:
 
 jobs:
@@ -44,20 +47,14 @@ jobs:
       - name: Install Playwright browsers
         run: python -m playwright install
 
-      - name: Install Allure CLI
-        run: npm install -g allure-commandline
-
-      - name: Run pytest suite
-        run: pytest -p no:asyncio --headless --alluredir=allure-results
-
       - name: Checkout gh-pages branch for Allure history
         if: always()
-        continue-on-error: true
         uses: actions/checkout@v4
         with:
           ref: gh-pages
           path: gh-pages
           fetch-depth: 0
+        continue-on-error: true
 
       - name: Copy Allure history from gh-pages
         if: always()
@@ -67,9 +64,13 @@ jobs:
             cp -a gh-pages/history allure-results/
           fi
 
+      - name: Run pytest suite
+        run: pytest -p no:asyncio --alluredir=allure-results
+
       - name: Generate Allure report
         if: always()
         run: |
+          npm install -g allure-commandline
           allure generate allure-results -o allure-report --clean
 
       - name: Deploy Allure report to gh-pages
