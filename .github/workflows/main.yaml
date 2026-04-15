@@ -1,0 +1,85 @@
+﻿name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Clean Python cache and previous Allure results
+        run: |
+          find . -type d -name "__pycache__" -exec rm -rf {} +
+          rm -rf allure-results
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest playwright pytest-playwright allure-pytest
+
+      - name: Install Playwright browsers
+        run: python -m playwright install
+
+      - name: Install Allure CLI
+        run: npm install -g allure-commandline
+
+      - name: Run pytest suite
+        run: pytest -p no:asyncio --headless --alluredir=allure-results
+
+      - name: Checkout gh-pages branch for Allure history
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+          fetch-depth: 0
+
+      - name: Copy Allure history from gh-pages
+        if: always()
+        run: |
+          mkdir -p allure-results
+          if [ -d gh-pages/history ]; then
+            cp -a gh-pages/history allure-results/
+          fi
+
+      - name: Generate Allure report
+        if: always()
+        run: |
+          allure generate allure-results -o allure-report --clean
+
+      - name: Deploy Allure report to gh-pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
+          publish_branch: gh-pages
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
