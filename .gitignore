@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+python-env/
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+pip-wheel-metadata/
+pyvenv.cfg
+
+# pytest and Playwright
+.pytest_cache/
+playwright-report/
+allure-results/
+allure-report/
+reports/
+test-output/
+htmlcov/
+coverage.xml
+*.log
+
+# IDE / editor
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
