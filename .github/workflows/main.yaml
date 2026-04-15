@@ -3,10 +3,10 @@
 on:
   push:
     branches:
-      - main
+      - '*'
   pull_request:
     branches:
-      - main
+      - '*'
   workflow_dispatch:
 
 jobs:
@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
@@ -29,14 +31,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
       - name: Clean Python cache and previous Allure results
         run: |
-          find . -type d -name "__pycache__" -exec rm -rf {} +
+          find . -type d -name '__pycache__' -prune -exec rm -rf '{}' +
           rm -rf allure-results
 
       - name: Install Python dependencies
